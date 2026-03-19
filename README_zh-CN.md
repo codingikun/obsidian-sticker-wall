@@ -57,7 +57,7 @@
 ### 方式二：手动安装
 
 1. 从 [Releases](https://github.com/codingkun/obsidian-sticker-wall/releases) 下载最新版本
-2. 解压后将 `manifest.json` 和 `main.js` 放入 vault 的 `.obsidian/plugins/obsidian-sticker/` 目录
+2. 解压后将 `manifest.json` 和 `main.js` 放入 vault 的 `.obsidian/plugins/sticker-wall/` 目录
 3. 在 Obsidian 设置中启用插件
 
 ### 方式三：开发版本

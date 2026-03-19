@@ -57,7 +57,7 @@ A virtual sticky note wall plugin for Obsidian that lets you create and manage n
 ### Option 2: Manual Install
 
 1. Download the latest release from [Releases](https://github.com/codingkun/obsidian-sticker-wall/releases)
-2. Extract and put `manifest.json` and `main.js` into `.obsidian/plugins/obsidian-sticker/` folder in your vault
+2. Extract and put `manifest.json` and `main.js` into `.obsidian/plugins/sticker-wall/` folder in your vault
 3. Enable the plugin in Obsidian settings
 
 ### Option 3: Development Version
