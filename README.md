@@ -19,31 +19,8 @@ A virtual sticky note wall plugin for Obsidian that lets you create and manage n
 
 ## Preview
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│    ┌─────────┐              ┌─────────┐                │
-│    │  tape   │              │  tape   │                │
-│    ├─────────┤              ├─────────┤                │
-│    │ Title   │              │ Title   │                │
-│    │ --------│              │ --------│                │
-│    │ Content │              │ Content │                │
-│    │ with    │              │ **bold**│                │
-│    │ *italic*│              │         │                │
-│    └─────────┘              └─────────┘                │
-│                                                         │
-│           ┌─────────┐                                   │
-│           │  tape   │                                   │
-│           ├─────────┤                                   │
-│           │ Title   │                                   │
-│           │ --------│                                   │
-│           │ Notes   │                                   │
-│           │ - [x] Task1│                                 │
-│           │ - [ ] Task2│                                 │
-│           └─────────┘                                   │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
+<img width="1556" height="872" alt="image" src="https://github.com/user-attachments/assets/8de7ff53-ff61-490e-b8b7-6dcbac24de7c" />
+
 
 ## Installation
 
