@@ -1,0 +1,9 @@
+{
+  "id": "obsidian-sticker",
+  "name": "Sticker Wall",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Post-it Wall-Draggable Sticker Wall",
+  "author": "codingkun",
+  "isDesktopOnly": true
+}
