@@ -19,7 +19,7 @@
   "name": "Sticker Wall",                  // ✅ 显示名称
   "version": "1.0.1",                      // ✅ 语义版本 (x.y.z)
   "minAppVersion": "0.15.0",               // ✅ 最低 Obsidian 版本
-  "description": "Drag-and-drop sticky note wall with Markdown support", // ✅ 简短描述
+  "description": "Drag-and-drop sticky note wall with Markdown support.", // ✅ 简短描述
   "author": "codingkun",                   // ✅ 作者
   "isDesktopOnly": true                    // ✅ 桌面端专用
 }
@@ -40,7 +40,7 @@
 
 ### Step 1: 创建 GitHub Release
 
-1. 在 GitHub 上访问仓库: `https://github.com/codingkun/obsidian-sticker-wall/releases`
+1. 在 GitHub 上访问仓库: `https://github.com/codingikun/obsidian-sticker-wall/releases`
 
 2. 点击 **Draft a new release**
 
