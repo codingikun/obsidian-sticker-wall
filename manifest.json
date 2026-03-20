@@ -3,7 +3,7 @@
   "name": "Sticker Wall",
   "version": "1.0.1",
   "minAppVersion": "0.15.0",
-  "description": "Drag-and-drop sticky note wall with Markdown support",
+  "description": "Drag-and-drop sticky note wall with Markdown support.",
   "author": "codingkun",
   "isDesktopOnly": true
 }
