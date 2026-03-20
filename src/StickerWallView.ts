@@ -176,7 +176,7 @@ export class StickerWallView extends ItemView {
     contentDiv.dataset.placeholder = UI_TEXT.content;
     contentDiv.textContent = '';
 
-    // 回车添加贴纸
+    // 回车添加贴纸（Shift+Enter 换行）
     contentDiv.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -189,6 +189,11 @@ export class StickerWallView extends ItemView {
       if (e.key === 'Escape') {
         e.preventDefault();
         this.removeGhostSticker();
+      }
+      // Shift+Enter 插入换行
+      if (e.key === 'Enter' && e.shiftKey) {
+        e.preventDefault();
+        document.execCommand('insertLineBreak', false);
       }
     });
 
@@ -353,8 +358,9 @@ export class StickerWallView extends ItemView {
       .sticker-note .note-content .md-block {
         white-space: pre-wrap;
       }
-      .sticker-note .note-content p { margin: 0 0 8px 0; }
+      .sticker-note .note-content p { margin: 0 0 4px 0; line-height: 1.4; }
       .sticker-note .note-content p:last-child { margin-bottom: 0; }
+      .sticker-note .note-content br { display: block; content: ""; margin: 2px 0; }
       .sticker-note .note-content strong { font-weight: bold; }
       .sticker-note .note-content em { font-style: italic; }
       .sticker-note .note-content code {
@@ -431,12 +437,13 @@ export class StickerWallView extends ItemView {
 
   private addNote(userName: string, content: string, x?: number, y?: number, color?: string, tapeColor?: string) {
     // 处理 HTML 内容中的换行和空格
+    // contentEditable 中 Enter 会创建 <div>，我们统一转换为单换行
     let processedContent = content
       .replace(/<br\s*\/?>/gi, '\n')  // <br> 转为换行
-      .replace(/<div[^>]*>/gi, '\n')   // div 转为换行
-      .replace(/<\/div>/gi, '')        // 移除 div 标签
-      .replace(/<p[^>]*>/gi, '')       // 移除 p 标签开始
-      .replace(/<\/p>/gi, '\n\n')     // p 结束转为双换行
+      .replace(/<div[^>]*>/gi, '\n')   // <div> 转为换行
+      .replace(/<\/div>/gi, '\n')      // </div> 转为换行
+      .replace(/<p[^>]*>/gi, '\n')     // <p> 转为换行
+      .replace(/<\/p>/gi, '\n')        // </p> 转为换行
       .replace(/&nbsp;/gi, ' ')        // &nbsp; 转为空格
       .replace(/\n{3,}/g, '\n\n')      // 最多保留两个连续换行
       .trim();
@@ -559,10 +566,19 @@ export class StickerWallView extends ItemView {
         contentDiv.innerHTML = this.renderMarkdown(note.content);
       });
 
-      // 回车键保存并退出编辑
+      // 回车键保存并退出编辑，Shift+Enter 换行
       contentDiv.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          contentDiv.blur();
+        }
         if (e.key === 'Escape') {
           contentDiv.blur();
+        }
+        // Shift+Enter 插入换行
+        if (e.key === 'Enter' && e.shiftKey) {
+          e.preventDefault();
+          document.execCommand('insertLineBreak', false);
         }
       });
 
@@ -579,15 +595,12 @@ export class StickerWallView extends ItemView {
   private renderMarkdown(content: string): string {
     let html = content;
 
-    // 将 HTML <br> 标签转换为实际换行符，避免被转义显示为文字
-    html = html.replace(/<br\s*\/?>/gi, '\n');
-
-    // 转义 HTML（转换换行后需要重新处理 & 符号）
+    // 转义 HTML 特殊字符
     html = html.replace(/&/g, '&amp;')
                .replace(/</g, '&lt;')
                .replace(/>/g, '&gt;');
 
-    // 代码块 - 使用不同方式匹配避免模板字符串问题
+    // 代码块 - 需要先处理避免转义问题
     const codeBlockRegex = new RegExp('```(\\w*)\\n([\\s\\S]*?)```', 'g');
     html = html.replace(codeBlockRegex, (_, lang, code) => {
       return '<pre><code>' + code.trim() + '</code></pre>';
@@ -628,49 +641,29 @@ export class StickerWallView extends ItemView {
     // 分割线
     html = html.replace(/^---$/gm, '<hr>');
 
-    // 段落处理 - 保留换行用 <br>
-    const lines = html.split('\n');
-    const paragraphs: string[] = [];
-    let currentParagraph: string[] = [];
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed === '') {
-        // 空行转为 <br><br>
-        if (currentParagraph.length > 0) {
-          paragraphs.push('<p>' + currentParagraph.join(' ') + '</p><br>');
-          currentParagraph = [];
-        } else {
-          paragraphs.push('<br>');
-        }
-      } else if (trimmed.startsWith('<') && trimmed.endsWith('>')) {
-        if (currentParagraph.length > 0) {
-          paragraphs.push('<p>' + currentParagraph.join(' ') + '</p>');
-          currentParagraph = [];
-        }
-        paragraphs.push(trimmed);
-      } else {
-        currentParagraph.push(trimmed);
-      }
+    // 换行处理 - 统一使用 <br> 标签
+    // \n\n 或空行转为段落分隔，\n 转为 <br>
+    html = html.replace(/\n\n/g, '</p><br><p>');
+    html = html.replace(/\n/g, '<br>');
+    
+    // 包装在段落标签中（如果没有被其他标签包裹）
+    if (!html.startsWith('<p>') && !html.startsWith('<h') && !html.startsWith('<ul') && 
+        !html.startsWith('<blockquote') && !html.startsWith('<pre') && !html.startsWith('<hr')) {
+      html = '<p>' + html + '</p>';
     }
 
-    if (currentParagraph.length > 0) {
-      paragraphs.push('<p>' + currentParagraph.join(' ') + '</p>');
-    }
-
-    return paragraphs.join('\n');
+    return html;
   }
 
   // 将 HTML 转回 Markdown 文本
   private htmlToMarkdown(html: string): string {
     let text = html;
     
-    // 处理换行
-    text = text.replace(/<br\s*\/?>/gi, '\n');
+    // 处理代码块（先处理避免被其他规则影响）
+    text = text.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/gi, '```\n$1\n```');
     
-    // 处理段落
-    text = text.replace(/<\/p>/gi, '\n\n');
-    text = text.replace(/<p[^>]*>/gi, '');
+    // 处理行内代码
+    text = text.replace(/<code>(.*?)<\/code>/gi, '`$1`');
     
     // 处理标题
     text = text.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n');
@@ -688,10 +681,6 @@ export class StickerWallView extends ItemView {
     text = text.replace(/<del>(.*?)<\/del>/gi, '~~$1~~');
     text = text.replace(/<s>(.*?)<\/s>/gi, '~~$1~~');
     
-    // 处理代码
-    text = text.replace(/<code>(.*?)<\/code>/gi, '`$1`');
-    text = text.replace(/<pre><code>(.*?)<\/code><\/pre>/gi, '```\n$1\n```');
-    
     // 处理链接
     text = text.replace(/<a[^>]*href=["']([^"']*)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)');
     
@@ -706,6 +695,17 @@ export class StickerWallView extends ItemView {
     // 处理分割线
     text = text.replace(/<hr\s*\/?>/gi, '---\n');
     
+    // 处理段落和换行 - 关键：对称转换
+    // </p> 后跟 <br> 表示段落结束+换行，转为 \n\n
+    // 先处理 </p><br> 的情况
+    text = text.replace(/<\/p>\s*<br>\s*/gi, '\n\n');
+    // 再处理单独的 </p>
+    text = text.replace(/<\/p>/gi, '\n\n');
+    // 处理 <p> 标签
+    text = text.replace(/<p[^>]*>/gi, '');
+    // 处理单独的 <br>（不是 </p><br>）
+    text = text.replace(/<br\s*\/?>/gi, '\n');
+    
     // 移除剩余的 HTML 标签
     text = text.replace(/<[^>]+>/g, '');
     
@@ -716,8 +716,9 @@ export class StickerWallView extends ItemView {
     text = text.replace(/&quot;/g, '"');
     text = text.replace(/&nbsp;/g, ' ');
     
-    // 清理多余空白
-    text = text.replace(/\n{3,}/g, '\n\n');
+    // 清理多余空白，但保留双换行（段落分隔）
+    text = text.replace(/[ \t]+\n/g, '\n');  // 行尾空格
+    text = text.replace(/\n{4,}/g, '\n\n');  // 最多三个连续换行
     text = text.trim();
     
     return text;
