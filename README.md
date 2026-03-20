@@ -6,7 +6,7 @@ A virtual sticky note wall plugin for Obsidian that lets you create and manage n
 
 ![Obsidian](https://img.shields.io/badge/Obsidian-0.15.0+-blueviolet?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
-![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square)
+![Version](https://img.shields.io/badge/Version-1.0.1-orange?style=flat-square)
 
 ## Features
 
